@@ -1,0 +1,22 @@
+{
+    "Request": {
+        "Method": "POST",
+        "Path": "/api/game/create",
+        "Body": {
+            "uid": "123456789",
+            "category": "apush",
+            "difficulty": "easy",
+            "numQuestions": 10
+        }
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "success": true,
+                "uid": "123456789",
+                "gid": "987654321"
+            }
+        }
+    }
+}

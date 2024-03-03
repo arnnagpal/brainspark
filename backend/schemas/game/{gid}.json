@@ -1,0 +1,22 @@
+{
+    "Request": {
+        "Method": "POST",
+        "Path": "/api/game/:gid",
+        "Body": {}
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "gid": "dc3bf8f3-c3cd-4ad9-91e5-49b651d469e0",
+                "uid": "054963d3-1e49-4e7c-899b-57d1a9694147",
+                "category": "apush",
+                "difficulty": "easy",
+                "questions": [],
+                "powerups": [],
+                "score": 0,
+                "streak": 0
+            }
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "Request": {
+        "Method": "POST",
+        "Path": "/api/user/login",
+        "Body": {
+            "username": "example_name",
+            "password": "based64password"
+        }
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "success": true,
+                "uid": "123456789"
+            }
+        }
+    }
+}

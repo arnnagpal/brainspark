@@ -1,0 +1,17 @@
+{
+    "Request": {
+        "Method": "GET",
+        "Path": "/api/user/{uid}/correctanswer",
+        "Body": {}
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "uid": "123",
+                "score": 0,
+                "streak": 0
+            }
+        }
+    }
+}

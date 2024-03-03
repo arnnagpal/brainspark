@@ -1,0 +1,16 @@
+{
+    "Request": {
+        "Method": "GET",
+        "Path": "/api/user/{uid}",
+        "Body": {}
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "uid": "123",
+                "name": "John Doe"
+            }
+        }
+    }
+}

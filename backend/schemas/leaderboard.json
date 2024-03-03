@@ -1,0 +1,29 @@
+{
+    "Request": {
+        "Method": "GET",
+        "Path": "/api/leaderboard",
+        "Body": {
+        }
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "standings": [
+                    {
+                        "username": "user1",
+                        "score": 12
+                    },
+                    {
+                        "username": "user2",
+                        "score": 12
+                    },
+                    {
+                        "username": "user3",
+                        "score": 12
+                    }
+                ]
+            }
+        }
+    }
+}

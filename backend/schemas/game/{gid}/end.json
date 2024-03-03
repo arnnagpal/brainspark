@@ -1,0 +1,18 @@
+{
+    "Request": {
+        "Method": "GET",
+        "Path": "/api/game/:gid/end",
+        "Body": {}
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "success": true,
+                "message": "Game ended successfully",
+                "uid": "5f5e3e3e3e3e3e3e3e3e3e3e",
+                "userScore": 0
+            }
+        }
+    }
+}

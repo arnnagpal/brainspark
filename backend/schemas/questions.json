@@ -1,0 +1,40 @@
+{
+    "Request": {
+        "Method": "GET",
+        "Path": "/api/questions",
+        "Body": {
+            "topic": "apush",
+            "difficulty": "easy",
+            "numQuestions": 10
+        }
+    },
+    "Response": {
+        "Status": 200,
+        "Body": {
+            "data": {
+                "questions": [
+                    {
+                        "question": "Who was the first president of the United States?",
+                        "choices": [
+                            "George Washington",
+                            "Thomas Jefferson",
+                            "John Adams",
+                            "James Madison"
+                        ],
+                        "answer": "George Washington"
+                    },
+                    {
+                        "question": "What was the first permanent English settlement in the New World?",
+                        "choices": [
+                            "Jamestown",
+                            "Plymouth",
+                            "Roanoke",
+                            "Boston"
+                        ],
+                        "answer": "Jamestown"
+                    }
+                ]
+            }
+        }
+    }
+}
