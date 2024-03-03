@@ -3,7 +3,7 @@ import pkg from "redis-om";
 const { Schema, Repository } = pkg;
 import client from "../client.js";
 
-const gameSchema = new Schema("game", {
+const gameHistorySchema = new Schema("gameHistory", {
     //important data
     gid: {
         type: "string",
@@ -23,22 +23,14 @@ const gameSchema = new Schema("game", {
     numRight: {
         type: "number",
     },
-    questions: {
-        type: "string",
-    },
-    powerups: {
-        type: "string[]",
-    },
-    activePowerup: {
-        type: "string",
-    },
     score: {
         type: "number",
     },
-    streak: {
+    timestamp: {
         type: "number",
+        sortable: true,
     },
 });
 
-export const gameRepository = new Repository(gameSchema, client);
-await gameRepository.createIndex();
+export const gameHistoryRepository = new Repository(gameHistorySchema, client);
+await gameHistoryRepository.createIndex();

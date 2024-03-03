@@ -9,7 +9,11 @@
         "Body": {
             "data": {
                 "uid": "123",
-                "name": "John Doe"
+                "name": "John Doe",
+                "password": "213",
+                "current-game": "2382i3",
+                "games-played": 0,
+                "score": 200
             }
         }
     }

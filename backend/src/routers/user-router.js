@@ -4,7 +4,57 @@ import { userRespository } from "../models/User.js";
 import { uuid } from "uuidv4";
 import { gameRepository } from "../models/Game.js";
 
+import { gameHistoryRepository } from "../models/GameHistory.js";
+
+import { EntityId } from "redis-om";
+
 export const router = Router();
+
+router.post("/:uid/fake-game-history", async (req, res) => {
+    const { uid } = req.params;
+
+    await gameHistoryRepository.save({
+        uid: uid,
+        timestamp: Date.now(),
+    });
+
+    const pastGames = await gameHistoryRepository
+        .search()
+        .where("uid")
+        .eq(uid)
+        .sortBy("timestamp", "asc")
+        .returnAll();
+
+    let pastGamesLength = pastGames.length;
+    while (pastGamesLength > 6) {
+        await gameHistoryRepository.remove(
+            pastGames[pastGames.length - pastGamesLength][EntityId]
+        );
+        pastGamesLength--;
+    }
+
+    res.json({
+        data: {
+            success: true,
+            message: "fake game added",
+            uid: uid,
+        },
+    });
+});
+
+router.get("/:uid/game-history", async (req, res) => {
+    const { uid } = req.params;
+
+    const games = await gameHistoryRepository
+        .search()
+        .where("uid")
+        .eq(uid)
+        .returnAll();
+
+    res.json({
+        data: games,
+    });
+});
 
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -103,13 +153,13 @@ router.post("/signup", async (req, res) => {
 router.get("/:uid", async (req, res) => {
     const { uid } = req.params;
 
-    const user = await userRespository
+    const users = await userRespository
         .search()
         .where("uid")
         .eq(uid)
         .returnAll();
 
-    if (user == null) {
+    if (users.length == 0) {
         res.status(400).json({
             data: {
                 success: false,
@@ -120,10 +170,16 @@ router.get("/:uid", async (req, res) => {
         return;
     }
 
+    const user = users[0];
+
     res.json({
         data: {
             uid: user.uid,
             name: user.displayname,
+            password: user.password,
+            "current-game": user["current-game"],
+            "games-played": user["games-played"],
+            score: user.score,
             debug: user,
         },
     });
@@ -177,17 +233,20 @@ router.get("/:uid/correctanswer", async (req, res) => {
     let score = 100;
 
     if (
-        game.powerups.includes("double-jeaporady") ||
-        game.powerups.includes("double-score")
+        game.activePowerup === "double-jeaporady" ||
+        game.activePowerup === "double-score"
     ) {
         score *= 2;
+    } else if (game.activePowerup === "streak-boost") {
+        score += 100;
     }
 
     game.score += score;
+    game.numRight += 1;
 
-    if (game.streak % 3 === 0) {
-        game.score += 25;
+    game.score += 25 * Math.floor(game.streak / 4);
 
+    if (game.streak % 4 === 0) {
         // pick a random powerup
         const powerup =
             all_powerups[Math.floor(Math.random() * all_powerups.length)];
@@ -197,9 +256,13 @@ router.get("/:uid/correctanswer", async (req, res) => {
             game.powerups = [];
         }
 
-        game.powerups.push(powerup);
-        powersAdded.push(powerup);
+        if (!game.powerups.includes(powerup)) {
+            game.powerups.push(powerup);
+            powersAdded.push(powerup);
+        }
     }
+
+    game.activePowerup = "";
 
     await gameRepository.save(game);
 
@@ -257,6 +320,12 @@ router.get("/:uid/incorrectanswer", async (req, res) => {
 
     game.streak = 0;
     game.score -= 50;
+
+    if (game.activePowerup === "double-jeaporady") {
+        score -= 50;
+    }
+
+    game.activePowerup = "";
 
     await gameRepository.save(game);
 

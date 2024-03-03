@@ -1,10 +1,14 @@
 <!-- add a leaderboard page. Use tailwind and make a table -->
 <script>
+    import fetch from "node-fetch";
+    import { onMount } from "svelte";
+    import { getCookie } from "svelte-cookie/dist";
+    import { push } from "svelte-spa-router";
     let leaderboard = [
         { name: "User 1", score: 100 },
         { name: "User 2", score: 90 },
-        { name: "User 3", score: 80 },
-        { name: "User 3", score: 80 },
+        { name: "User 4", score: 80 },
+        { name: "User 5", score: 80 },
         { name: "User 3", score: 80 },
         { name: "User 3", score: 80 },
         { name: "User 3", score: 80 },
@@ -38,6 +42,32 @@
         { name: "User 3", score: 80 },
         // ... add more users as needed
     ];
+
+    let showAccountDropdown = false;
+
+    onMount(async () => {
+        const uid = getCookie("uid");
+        if (!uid) {
+            console.log("User is not logged in");
+            // redirect to dashboard
+            push("/");
+            return;
+        }
+
+        // fetch leaderboard
+        let response = await fetch(process.env.API_URL + "/leaderboard", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        let data = await response.json();
+        let resData = data.data;
+        // remove uid prop frm resData
+        delete resData.uid;
+        leaderboard = resData;
+    });
 </script>
 
 <header class="flex justify-between p-10 items-center">
@@ -51,14 +81,16 @@
         <ul class="flex items-center">
             <li class="font-bold"><a href="/">Home</a></li>
             <li class="px-2"></li>
-            <li class="font-bold"><a href="/">Create a Game</a></li>
-            <li class="px-2"></li>
             <li class="font-bold"><a href="/#/leaderboard">Leaderboard</a></li>
             <li class="px-2"></li>
             <li class="font-bold"><a href="/about">About</a></li>
             <li class="px-2"></li>
             <li class="font-bold">
-                <button class="flex items-center">
+                <button
+                    class="flex items-center"
+                    on:click={() =>
+                        (showAccountDropdown = !showAccountDropdown)}
+                >
                     <img
                         src="../../assets/account.png"
                         alt="user"
@@ -94,6 +126,7 @@
                 <th class="px-4 py-2">Score</th>
             </tr>
         </thead>
+        <!-- TODO: add a filter feature -->
         <tbody class="h-[32rem] overflow-auto block">
             {#each leaderboard as { name, score }, i}
                 <tr
@@ -112,3 +145,18 @@
     <!-- padding at bottom -->
     <p class="py-10"></p>
 </div>
+
+{#if showAccountDropdown}
+    <div
+        class="fixed top-0 right-0 mt-[7rem] mr-10 bg-white p-5 rounded-md shadow-lg"
+    >
+        <ul>
+            <li class="py-2">
+                <a href="/#/account">Account</a>
+            </li>
+            <li class="py-2">
+                <a href="/#/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+{/if}

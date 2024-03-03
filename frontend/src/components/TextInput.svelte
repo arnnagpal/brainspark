@@ -1,6 +1,7 @@
 <script>
-    let value = "";
+    export let value = "";
     export let placeholder;
+    export let disabled = false;
 </script>
 
 <input
@@ -8,4 +9,5 @@
     bind:value
     {placeholder}
     type="text"
+    {disabled}
 />

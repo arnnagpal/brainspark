@@ -1,5 +1,28 @@
 <script>
-    let value = "";
+    import { onMount } from "svelte";
+    export let value = "";
+    export let disabled = false;
+    export let show = false;
+
+    let inputElement;
+
+    onMount(() => {
+        inputElement.type = "password";
+    });
+
+    $: show, updateType();
+
+    function updateType() {
+        if (!inputElement) {
+            return;
+        }
+        console.log("Showing password: " + show);
+        if (show) {
+            inputElement.type = "text";
+        } else {
+            inputElement.type = "password";
+        }
+    }
 </script>
 
 <input
@@ -7,4 +30,6 @@
     bind:value
     placeholder="Password"
     type="password"
+    {disabled}
+    bind:this={inputElement}
 />

@@ -11,7 +11,11 @@
                 "uid": "123",
                 "score": 0,
                 "streak": 0,
-                "powerupsAdded": ["double-jeaporady", "2x", "streak-boost"]
+                "powerupsAdded": [
+                    "double-jeaporady",
+                    "double-score",
+                    "streak-boost"
+                ]
             }
         }
     }

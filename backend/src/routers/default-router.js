@@ -18,10 +18,6 @@ router.get("/leaderboard", async (req, res) => {
         .sortBy("score", "desc")
         .returnAll();
 
-    if (users.length > 10) {
-        users.length = 10;
-    }
-
     let data = users.map((user) => {
         return {
             uid: user.uid,

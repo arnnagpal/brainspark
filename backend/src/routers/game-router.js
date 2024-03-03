@@ -1,6 +1,7 @@
 import { Router } from "express";
 import axios from "axios";
 import { gameRepository } from "../models/Game.js";
+import { gameHistoryRepository } from "../models/GameHistory.js";
 import { userRespository } from "../models/User.js";
 import { uuid } from "uuidv4";
 import { EntityId } from "redis-om";
@@ -75,6 +76,7 @@ router.post("/create", async (req, res) => {
                 category,
                 difficulty,
                 numQuestions,
+                numRight: 0,
                 questions: JSON.stringify(response.data.data.questions),
                 powerups: [],
                 score: 0,
@@ -106,6 +108,7 @@ router.post("/create", async (req, res) => {
 
             res.json({
                 data: {
+                    success: true,
                     uid: uid,
                     gid: gid,
                 },
@@ -117,6 +120,48 @@ router.post("/create", async (req, res) => {
                 error: "Failed to generate questions",
             });
         });
+});
+
+router.post("/activate-powerup/", async (req, res) => {
+    const { powerup, gid } = req.body;
+
+    const game = await gameRepository.search().where("gid").eq(gid).returnAll();
+
+    if (game.length == 0) {
+        res.status(404).json({
+            success: false,
+            message: "Game not found",
+        });
+
+        return;
+    }
+
+    console.log(game[0].powerups);
+    console.log(powerup);
+
+    if (!game[0].powerups.includes(powerup)) {
+        res.status(400).json({
+            success: false,
+            message: "Powerup not found",
+        });
+
+        return;
+    }
+
+    game[0].activePowerup = powerup;
+
+    // remove powerup from powerups list
+    game[0].powerups.splice(game[0].powerups.indexOf(powerup), 1);
+
+    await gameRepository.save(game[0]);
+
+    res.json({
+        data: {
+            success: true,
+            message: "Powerup activated",
+            allPowerups: game[0].powerups,
+        },
+    });
 });
 
 router.get("/:gid/end", async (req, res) => {
@@ -151,15 +196,47 @@ router.get("/:gid/end", async (req, res) => {
 
     user[0].score += game[0].score;
     user[0]["games-played"] += 1;
+    user[0]["current-game"] = "";
+
+    let gameScore = game[0].score;
 
     await userRespository.save(user[0]);
+
     await gameRepository.remove(game[0][EntityId]);
+
+    await gameHistoryRepository.save({
+        gid: gid,
+        uid: user[0].uid,
+        category: game[0].category,
+        difficulty: game[0].difficulty,
+        numQuestions: game[0].numQuestions,
+        numRight: game[0].numRight,
+        score: game[0].score,
+        streak: game[0].streak,
+        timestamp: Date.now(),
+    });
+
+    const pastGames = await gameHistoryRepository
+        .search()
+        .where("uid")
+        .eq(user[0].uid)
+        .sortBy("timestamp", "asc")
+        .returnAll();
+
+    let pastGamesLength = pastGames.length;
+    while (pastGamesLength > 6) {
+        await gameHistoryRepository.remove(
+            pastGames[pastGames.length - pastGamesLength][EntityId]
+        );
+        pastGamesLength--;
+    }
 
     res.json({
         data: {
             success: true,
             message: "Game ended successfully",
             uid: user[0].uid,
+            gameScore: gameScore,
             userScore: user[0].score,
         },
     });

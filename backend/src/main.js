@@ -4,14 +4,10 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 
-const corsOptions = {
-    origin: "http://127.0.0.1:8080",
-};
-
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json());
 
 import { router as userRouter } from "./routers/user-router.js";
