@@ -29,7 +29,7 @@ Requirements
 
 **In order to run the project, you must have:**
 * An OpenAI Key - In order to generate the content for the game
-* A Redis Server - To store the data & games
+* A [Redis Server](https://hub.docker.com/r/redislabs/redisearch) - To store the data & games
 
 #### Backend
 
